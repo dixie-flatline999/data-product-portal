@@ -1,13 +1,14 @@
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import UUID, Boolean, Column, DateTime, String
+from sqlalchemy import UUID, Boolean, Column, DateTime, String, ForeignKey
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 
-from app.database.database import Base, ensure_exists
+from app.database.database import ensure_exists
 from app.events.model import Event
-from app.shared.model import BaseORM
+from app.identities.model import Identity
+from app.identities.type import IdentityType
 
 if TYPE_CHECKING:
     from app.authorization.role_assignments.data_product.model import (
@@ -30,12 +31,18 @@ if TYPE_CHECKING:
     from app.users.notifications.model import Notification
 
 
-class User(Base, BaseORM):
+class User(Identity):
     __tablename__ = "users"
+    __mapper_args__ = {
+        "polymorphic_identity": IdentityType.USER.value,
+    }
 
-    id = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("identities.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
     email = Column(String, unique=True)
-    external_id = Column(String)
     first_name = Column(String)
     last_name = Column(String)
     events: Mapped[list[Event]] = relationship(
