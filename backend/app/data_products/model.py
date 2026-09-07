@@ -48,7 +48,7 @@ def _has_user_access_to_hidden_data_product(cls, user_id: uuid.UUID):
     return (
         select(DataProductRoleAssignment.id)
         .where(DataProductRoleAssignment.data_product_id == cls.id)
-        .where(DataProductRoleAssignment.user_id == user_id)
+        .where(DataProductRoleAssignment.identity_id == user_id)
         .where(DataProductRoleAssignment.decision == DecisionStatus.APPROVED)
         .exists()
     )
