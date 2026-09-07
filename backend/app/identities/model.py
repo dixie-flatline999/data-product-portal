@@ -12,7 +12,6 @@ from typing import TYPE_CHECKING
 
 # Added for type checking in the IDE, disabled at runtime to avoid circular dependencies
 if TYPE_CHECKING:
-    from app.groups.model import GroupMembership
     from app.authorization.role_assignments.data_product.model import (
         DataProductRoleAssignment,
     )
@@ -48,13 +47,6 @@ class Identity(Base, BaseORM):
     __mapper_args__ = {
         "polymorphic_on": type
     }
-
-    member_of: Mapped[list["GroupMembership"]] = relationship(
-        back_populates="member",
-        foreign_keys="GroupMembership.member_identity_id",
-        cascade="all, delete-orphan",
-        lazy="raise",
-    )
 
     data_product_roles: Mapped[list["DataProductRoleAssignment"]] = relationship(
         foreign_keys="DataProductRoleAssignment.identity_id",

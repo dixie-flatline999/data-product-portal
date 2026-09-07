@@ -57,7 +57,6 @@ class GroupMembership(Base, BaseORM):
         lazy="raise",
     )
     member: Mapped[Identity] = relationship(
-        back_populates="member_of",
         foreign_keys=[member_identity_id],
         lazy="joined",
     )
