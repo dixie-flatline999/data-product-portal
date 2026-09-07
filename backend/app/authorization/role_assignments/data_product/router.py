@@ -74,7 +74,7 @@ def delete_data_product_role_assignment(
             name=EventType.DATA_PRODUCT_ROLE_ASSIGNMENT_REMOVED,
             subject_id=assignment.data_product_id,
             subject_type=EventReferenceEntity.DATA_PRODUCT,
-            target_id=assignment.user_id,
+            target_id=assignment.identity_id,
             target_type=EventReferenceEntity.USER,
             actor_id=user.id,
         ),
@@ -94,7 +94,7 @@ def delete_data_product_role_assignment(
 @router.get("")
 def list_data_product_role_assignments(
     data_product_id: Annotated[UUID | SkipJsonSchema[None], Query()] = None,
-    user_id: Annotated[UUID | SkipJsonSchema[None], Query()] = None,
+    identity_id: Annotated[UUID | SkipJsonSchema[None], Query()] = None,
     role_id: Annotated[UUID | SkipJsonSchema[None], Query()] = None,
     decision: Annotated[DecisionStatus | SkipJsonSchema[None], Query()] = None,
     db: Session = Depends(get_db_session),
@@ -102,7 +102,7 @@ def list_data_product_role_assignments(
     return ListDataProductRoleAssignmentsResponse(
         role_assignments=RoleAssignmentService(db).list_assignments(
             data_product_id=data_product_id,
-            user_id=user_id,
+            identity_id=identity_id,
             role_id=role_id,
             decision=decision,
         )
@@ -129,7 +129,7 @@ def request_data_product_role_assignment(
     role_assignment = service.create_assignment(
         data_product_id=request.data_product_id,
         role_id=request.role_id,
-        user_id=request.user_id,
+        identity_id=request.identity_id,
         actor=user,
     )
     EventService(db).create_event(
@@ -137,7 +137,7 @@ def request_data_product_role_assignment(
             name=EventType.DATA_PRODUCT_ROLE_ASSIGNMENT_REQUESTED,
             subject_id=role_assignment.data_product_id,
             subject_type=EventReferenceEntity.DATA_PRODUCT,
-            target_id=role_assignment.user_id,
+            target_id=role_assignment.identity_id,
             target_type=EventReferenceEntity.USER,
             actor_id=user.id,
         )
@@ -149,9 +149,9 @@ def request_data_product_role_assignment(
     )
     other_approvers = [a for a in approvers if a != user]
     if other_approvers:
-        background_tasks.add_task(
+        background_tasks.add_task( # TODO evaluate in depth
             email.send_role_assignment_request_email,
-            deepcopy(role_assignment.user),
+            deepcopy(role_assignment.identity),
             deepcopy(role_assignment.data_product),
             [deepcopy(approver) for approver in other_approvers],
         )
@@ -179,7 +179,7 @@ def create_data_product_role_assignment(
     service = RoleAssignmentService(db=db)
     role_assignment = service.create_assignment(
         data_product_id=body.data_product_id,
-        user_id=body.user_id,
+        identity_id=body.identity_id,
         role_id=body.role_id,
         actor=user,
     )
@@ -189,8 +189,8 @@ def create_data_product_role_assignment(
             name=EventType.DATA_PRODUCT_ROLE_ASSIGNMENT_CREATED,
             subject_id=role_assignment.data_product_id,
             subject_type=EventReferenceEntity.DATA_PRODUCT,
-            target_id=role_assignment.user_id,
-            target_type=EventReferenceEntity.USER,
+            target_id=role_assignment.identity_id,
+            target_type=EventReferenceEntity.USER, # TODO change to identity
             actor_id=user.id,
         )
     )
@@ -215,7 +215,7 @@ def create_data_product_role_assignment(
     else:
         background_tasks.add_task(
             email.send_role_assignment_request_email,
-            deepcopy(role_assignment.user),
+            deepcopy(role_assignment.identity),
             deepcopy(role_assignment.data_product),
             [deepcopy(approver) for approver in approvers],
         )
@@ -268,7 +268,7 @@ def decide_data_product_role_assignment(
             ),
             subject_id=assignment.data_product_id,
             subject_type=EventReferenceEntity.DATA_PRODUCT,
-            target_id=assignment.user_id,
+            target_id=assignment.identity_id,
             target_type=EventReferenceEntity.USER,
             actor_id=user.id,
         ),
@@ -315,7 +315,7 @@ def modify_data_product_role_assignment(
             name=EventType.DATA_PRODUCT_ROLE_ASSIGNMENT_UPDATED,
             subject_id=assignment.data_product_id,
             subject_type=EventReferenceEntity.DATA_PRODUCT,
-            target_id=assignment.user_id,
+            target_id=assignment.identity_id,
             target_type=EventReferenceEntity.USER,
             actor_id=user.id,
         ),

@@ -9,12 +9,13 @@ from app.authorization.role_assignments.global_.model import (
     GlobalRoleAssignment as GlobalRoleAssignmentModel,
 )
 from app.authorization.roles.schema import Role
+from app.identities.model import Identity
 from app.shared.schema import ORMModel
 from app.users.schema import User
 
 
 class CreateGlobalRoleAssignment(BaseModel):
-    user_id: UUID
+    identity_id: UUID
     role_id: Union[UUID, Literal["admin"]]
 
 
@@ -31,13 +32,13 @@ class ModifyGlobalRoleAssignment(BaseModel):
 
 
 class RoleAssignmentRequest(BaseModel):
-    user_id: UUID
+    identity_id: UUID
     role_id: UUID
 
 
 class GlobalRoleAssignmentResponse(ORMModel):
     id: UUID
-    user: User
+    identity: Identity
     role: Role
     decision: DecisionStatus
     requested_on: Optional[datetime]
@@ -54,7 +55,7 @@ class ListGlobalRoleAssignmentsResponse(ORMModel):
 
 
 class GlobalRoleAssignment(GlobalRoleAssignmentResponse):
-    user_id: UUID
+    identity_id: UUID
     role_id: UUID
     requested_by_id: Optional[UUID]
     decided_by_id: Optional[UUID]

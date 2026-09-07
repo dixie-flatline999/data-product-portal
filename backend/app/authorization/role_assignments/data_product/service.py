@@ -39,7 +39,7 @@ class RoleAssignmentService:
         self,
         *,
         data_product_id: Optional[UUID] = None,
-        user_id: Optional[UUID] = None,
+        identity_id: Optional[UUID] = None,
         role_id: Optional[UUID] = None,
         decision: Optional[DecisionStatus] = None,
     ) -> Sequence[DataProductRoleAssignment]:
@@ -48,8 +48,8 @@ class RoleAssignmentService:
             query = query.where(
                 DataProductRoleAssignmentModel.data_product_id == data_product_id
             )
-        if user_id is not None:
-            query = query.where(DataProductRoleAssignmentModel.identity_id == user_id)
+        if identity_id is not None:
+            query = query.where(DataProductRoleAssignmentModel.identity_id == identity_id)
         if role_id is not None:
             query = query.where(DataProductRoleAssignmentModel.role_id == role_id)
         if decision is not None:
@@ -58,7 +58,7 @@ class RoleAssignmentService:
         return self.db.scalars(query).all()
 
     def create_assignment(
-        self, data_product_id: UUID, role_id: UUID, user_id: UUID, *, actor: User
+        self, data_product_id: UUID, role_id: UUID, identity_id: UUID, *, actor: User
     ) -> DataProductRoleAssignment:
         self.ensure_is_data_product_scope(role_id)
         dp = ensure_data_product_exists(data_product_id, self.db)
@@ -69,7 +69,7 @@ class RoleAssignmentService:
             )
         existing_assignment = self.db.scalar(
             select(DataProductRoleAssignmentModel).where(
-                DataProductRoleAssignmentModel.identity_id == user_id,
+                DataProductRoleAssignmentModel.identity_id == identity_id,
                 DataProductRoleAssignmentModel.data_product_id == data_product_id,
             )
         )
@@ -86,7 +86,7 @@ class RoleAssignmentService:
                 )
 
         role_assignment = DataProductRoleAssignmentModel(
-            identity_id=user_id,
+            identity_id=identity_id,
             role_id=role_id,
             data_product_id=data_product_id,
             requested_on=datetime.now(),

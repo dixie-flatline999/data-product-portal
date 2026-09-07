@@ -4,12 +4,14 @@ import emailgen
 
 from app.core.email.send_mail import send_mail
 from app.data_products.schema import DataProduct
+from app.identities.model import Identity
+from app.users.model import User as UserModel
 from app.settings import settings
 from app.users.schema import User
 
 
 def send_role_assignment_request_email(
-    role_assignment_user: User,
+    role_assignment_identity: Identity,
     role_assignment_data_product: DataProduct,
     approvers: Sequence[User],
 ) -> None:
@@ -20,7 +22,7 @@ def send_role_assignment_request_email(
     action = emailgen.Table(["User", "Request", "Data Product", "Owned By"])
     action.add_row(
         [
-            f"{role_assignment_user.first_name} {role_assignment_user.last_name}",
+            f"{get_identity_display_name(role_assignment_identity)}",
             "Wants to join ",
             role_assignment_data_product.name,
             ", ".join([f"{user.first_name} {user.last_name}" for user in approvers]),
@@ -31,7 +33,13 @@ def send_role_assignment_request_email(
         approvers,
         action,
         url,
-        f"Action Required: {role_assignment_user.first_name} "
-        f"{role_assignment_user.last_name} wants "
+        f"Action Required: {get_identity_display_name(role_assignment_identity)} wants "
         f"to join {role_assignment_data_product.name}",
     )
+
+
+def get_identity_display_name(identity: Identity) -> str:
+    if isinstance(identity, UserModel):
+        return f"{identity.first_name} {identity.last_name}"
+    else:
+        return identity.display_name
