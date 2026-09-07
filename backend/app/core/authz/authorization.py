@@ -10,13 +10,13 @@ from opentelemetry import trace
 from sqlalchemy.orm import Session
 
 from app.core.auth.auth import get_authenticated_user
+from app.data_products.model import DataProduct, DataProductVisibility
 from app.database import database
-from app.database.database import get_db_session
+from app.database.deps import get_db_session
 from app.settings import settings
 from app.users.schema import User
 from app.utils.singleton import Singleton
 
-from ...data_products.model import DataProduct, DataProductVisibility
 from .actions import AuthorizationAction
 from .resolvers import SubjectResolver
 
@@ -66,10 +66,15 @@ class Authorization(metaclass=Singleton):
             user: User = Depends(get_authenticated_user),
             db: Session = Depends(get_db_session),
         ) -> None:
-            obj = await resolver.resolve(request, object_id, db)
-            dom = await resolver.resolve_domain(db, obj)
+            context = await resolver.resolve_context(request, object_id, db)
 
-            if not cls().has_access(sub=str(user.id), dom=dom, obj=obj, act=action):
+            if not cls().has_access(
+                sub=str(user.id),
+                dom=context.domain_id,
+                obj=context.object_id,
+                parent=context.parent_id,
+                act=action,
+            ):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="You don't have permission to perform this action",
@@ -79,11 +84,17 @@ class Authorization(metaclass=Singleton):
 
     @cachedmethod(lambda self: self._cache)
     def has_access(
-        self, *, sub: str, dom: str, obj: str, act: AuthorizationAction
+        self,
+        *,
+        sub: str,
+        dom: str,
+        obj: str,
+        act: AuthorizationAction,
+        parent: str = "*",
     ) -> bool:
         with tracer.start_as_current_span("has_access"):
             enforcer: SyncedEnforcer = self._enforcer
-            return enforcer.enforce(sub, dom, obj, str(act))
+            return enforcer.enforce(sub, dom, obj, parent, str(act))
 
     def _after_update(self) -> None:
         """The cache should be purged when the casbin database is altered,
