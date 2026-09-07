@@ -37,7 +37,7 @@ class RoleAssignmentService:
     ) -> Sequence[GlobalRoleAssignment]:
         query = select(GlobalRoleAssignmentModel)
         if user_id is not None:
-            query = query.where(GlobalRoleAssignmentModel.user_id == user_id)
+            query = query.where(GlobalRoleAssignmentModel.identity_id == user_id)
         if role_id is not None:
             query = query.where(GlobalRoleAssignmentModel.role_id == role_id)
         if decision is not None:
@@ -51,7 +51,8 @@ class RoleAssignmentService:
         self.ensure_is_global_scope(request.role_id)
         self.ensure_is_not_admin(request.role_id)
         role_assignment = GlobalRoleAssignmentModel(
-            **request.model_dump(),
+            identity_id=request.user_id,
+            role_id=request.role_id,
             requested_on=datetime.now(),
             requested_by_id=actor.id,
         )

@@ -19,7 +19,7 @@ class DataProductAuthAssignment(ResourceAuthAssignment):
 
         super().__init__(
             role_id=role_id,
-            user_id=assignment.user_id,
+            user_id=assignment.identity_id, # TODO rename user_id to identity_id after modifying casbin
             resource_id=assignment.data_product_id,
             previous_role_id=previous_role_id,
         )

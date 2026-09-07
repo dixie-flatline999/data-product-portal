@@ -49,7 +49,7 @@ class RoleAssignmentService:
                 DataProductRoleAssignmentModel.data_product_id == data_product_id
             )
         if user_id is not None:
-            query = query.where(DataProductRoleAssignmentModel.user_id == user_id)
+            query = query.where(DataProductRoleAssignmentModel.identity_id == user_id)
         if role_id is not None:
             query = query.where(DataProductRoleAssignmentModel.role_id == role_id)
         if decision is not None:
@@ -69,7 +69,7 @@ class RoleAssignmentService:
             )
         existing_assignment = self.db.scalar(
             select(DataProductRoleAssignmentModel).where(
-                DataProductRoleAssignmentModel.user_id == user_id,
+                DataProductRoleAssignmentModel.identity_id == user_id,
                 DataProductRoleAssignmentModel.data_product_id == data_product_id,
             )
         )
@@ -86,7 +86,7 @@ class RoleAssignmentService:
                 )
 
         role_assignment = DataProductRoleAssignmentModel(
-            user_id=user_id,
+            identity_id=user_id,
             role_id=role_id,
             data_product_id=data_product_id,
             requested_on=datetime.now(),
@@ -162,7 +162,7 @@ class RoleAssignmentService:
         query = (
             select(DataProductRoleAssignmentModel)
             .filter(
-                DataProductRoleAssignmentModel.user_id == user.id,
+                DataProductRoleAssignmentModel.identity_id == user.id,
             )
             .order_by(asc(DataProductRoleAssignmentModel.requested_on))
         )
@@ -186,7 +186,7 @@ class RoleAssignmentService:
         data_product_ids = (
             select(DataProductRoleAssignmentModel.data_product_id)
             .where(
-                DataProductRoleAssignmentModel.user_id == user.id,
+                DataProductRoleAssignmentModel.identity_id == user.id,
                 DataProductRoleAssignmentModel.decision == DecisionStatus.APPROVED,
                 Role.permissions.contains(
                     [Action.DATA_PRODUCT__APPROVE_USER_REQUEST.value]
@@ -222,7 +222,7 @@ class RoleAssignmentService:
                 select(UserModel)
                 .join(
                     DataProductRoleAssignmentModel,
-                    DataProductRoleAssignmentModel.user_id == UserModel.id,
+                    DataProductRoleAssignmentModel.identity_id == UserModel.id,
                 )
                 .join(Role, DataProductRoleAssignmentModel.role_id == Role.id)
                 .where(
