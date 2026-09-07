@@ -11,16 +11,9 @@ from app.identities.model import Identity
 from app.identities.type import IdentityType
 
 if TYPE_CHECKING:
-    from app.authorization.role_assignments.data_product.model import (
-        DataProductRoleAssignment,
-    )
-    from app.authorization.role_assignments.global_.model import (
-        GlobalRoleAssignment,
-    )
     from app.authorization.role_assignments.output_port.model import (
         DatasetRoleAssignment,
     )
-    from app.data_products.model import DataProduct
     from app.data_products.output_port_technical_assets_link.model import (
         DataOutputDatasetAssociation,
     )
@@ -59,35 +52,8 @@ class User(Identity):
         lazy="raise",
     )
 
-    # Relationships - Data Products
-    data_product_roles: Mapped[list["DataProductRoleAssignment"]] = relationship(
-        foreign_keys="DataProductRoleAssignment.user_id",
-        back_populates="user",
-        # Deliberately lazy:
-        #  - Used in limited cases, only on a single user
-        #  - Complicates get_authenticated_user
-        #  - Private dataset test cases become more complex
-        #    (need to manipulate the session to avoid a user being cached with a
-        #     membership field with raise load strategy)
-        lazy="select",
-    )
-    data_products: Mapped[list["DataProduct"]] = association_proxy(
-        "data_product_roles", "data_product"
-    )
     explorations: Mapped[list["Exploration"]] = relationship(
         foreign_keys="Exploration.owner_id", back_populates="owner", lazy="raise"
-    )
-
-    global_role: Mapped["GlobalRoleAssignment"] = relationship(
-        foreign_keys="GlobalRoleAssignment.user_id",
-        back_populates="user",
-        # Deliberately lazy:
-        #  - Used in limited cases, only on a single user
-        #  - Complicates get_authenticated_user
-        #  - Private dataset test cases become more complex
-        #    (need to manipulate the session to avoid a user being cached with a
-        #     membership field with raise load strategy)
-        lazy="select",
     )
 
     # Relationships - Datasets
