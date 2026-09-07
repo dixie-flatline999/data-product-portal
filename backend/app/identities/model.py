@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import CheckConstraint, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.associationproxy import association_proxy, AssociationProxy
 
 from app.database.database import Base
 from app.shared.model import BaseORM
@@ -67,7 +67,7 @@ class Identity(Base, BaseORM):
         #     membership field with raise load strategy)
         lazy="select",
     )
-    data_products: Mapped[list["DataProduct"]] = association_proxy(
+    data_products: AssociationProxy[list["DataProduct"]] = association_proxy(
         "data_product_roles",
         "data_product",
     )
