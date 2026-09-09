@@ -169,7 +169,7 @@ def clear_db(session: Session) -> None:
 def admin() -> UserFactory:
     role = RoleFactory.admin()
     user = UserFactory(external_id=settings.DEFAULT_USERNAME)
-    GlobalRoleAssignmentFactory(user_id=user.id, role_id=role.id)
+    GlobalRoleAssignmentFactory(identity_id=user.id, role_id=role.id)
     return user
 
 

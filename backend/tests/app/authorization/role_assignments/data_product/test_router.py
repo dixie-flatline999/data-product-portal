@@ -34,7 +34,7 @@ class TestDataProductRoleAssignmentsRouter:
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
         assignment: DataProductRoleAssignment = DataProductRoleAssignmentFactory(
-            data_product_id=data_product.id, user_id=user.id, role_id=role.id
+            data_product_id=data_product.id, identity_id=user.id, role_id=role.id
         )
         response = client.get(f"{ENDPOINT}")
 
@@ -69,7 +69,7 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=permissions,
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
@@ -78,7 +78,7 @@ class TestDataProductRoleAssignmentsRouter:
             f"{ENDPOINT}",
             json={
                 "data_product_id": str(data_product.id),
-                "user_id": str(user.id),
+                "identity_id": str(user.id), # TODO user.id or me.id here?????
                 "role_id": str(role.id),
             },
         )
@@ -86,7 +86,7 @@ class TestDataProductRoleAssignmentsRouter:
 
         data = response.json()
         assert data["data_product"]["id"] == str(data_product.id)
-        assert data["user"]["id"] == str(user.id)
+        assert data["identity"]["id"] == str(user.id)
         assert data["role"]["id"] == str(role.id)
 
         # Verify Casbin update behavior
@@ -109,7 +109,7 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=[Action.DATA_PRODUCT__CREATE_USER],
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
@@ -118,7 +118,7 @@ class TestDataProductRoleAssignmentsRouter:
             f"{ENDPOINT}",
             json={
                 "data_product_id": str(data_product.id),
-                "user_id": str(user.id),
+                "identity_id": str(user.id),
                 "role_id": str(role.id),
             },
         )
@@ -132,14 +132,14 @@ class TestDataProductRoleAssignmentsRouter:
             scope=Scope.GLOBAL,
             permissions=[Action.GLOBAL__REQUEST_DATAPRODUCT_ACCESS],
         )
-        GlobalRoleAssignmentFactory(user_id=me.id, role_id=authz_role.id)
+        GlobalRoleAssignmentFactory(identity_id=me.id, role_id=authz_role.id)
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
 
         response = client.post(
             f"{ENDPOINT}/request",
             json={
-                "user_id": str(user.id),
+                "identity_id": str(user.id),
                 "role_id": str(role.id),
                 "data_product_id": str(data_product.id),
             },
@@ -148,7 +148,7 @@ class TestDataProductRoleAssignmentsRouter:
 
         data = response.json()
         assert data["data_product"]["id"] == str(data_product.id)
-        assert data["user"]["id"] == str(user.id)
+        assert data["identity"]["id"] == str(user.id)
         assert data["role"]["id"] == str(role.id)
 
     def test_request_assignment_generates_webhook_v2_event(
@@ -169,13 +169,13 @@ class TestDataProductRoleAssignmentsRouter:
             scope=Scope.GLOBAL,
             permissions=[Action.GLOBAL__REQUEST_DATAPRODUCT_ACCESS],
         )
-        GlobalRoleAssignmentFactory(user_id=requester.id, role_id=request_role.id)
+        GlobalRoleAssignmentFactory(identity_id=requester.id, role_id=request_role.id)
         approver_role = RoleFactory(
             scope=Scope.DATA_PRODUCT,
             permissions=[Action.DATA_PRODUCT__APPROVE_USER_REQUEST],
         )
         DataProductRoleAssignmentFactory(
-            user_id=requester.id,
+            identity_id=requester.id,
             role_id=approver_role.id,
             data_product_id=data_product.id,
         )
@@ -185,7 +185,7 @@ class TestDataProductRoleAssignmentsRouter:
         response = client.post(
             f"{ENDPOINT}/request",
             json={
-                "user_id": str(requested_user.id),
+                "identity_id": str(requested_user.id),
                 "role_id": str(requested_role.id),
                 "data_product_id": str(data_product.id),
             },
@@ -207,14 +207,14 @@ class TestDataProductRoleAssignmentsRouter:
             scope=Scope.GLOBAL,
             permissions=[Action.GLOBAL__REQUEST_DATAPRODUCT_ACCESS],
         )
-        GlobalRoleAssignmentFactory(user_id=requester.id, role_id=request_role.id)
+        GlobalRoleAssignmentFactory(identity_id=requester.id, role_id=request_role.id)
         approver_role = RoleFactory(
             scope=Scope.DATA_PRODUCT,
             permissions=[Action.DATA_PRODUCT__APPROVE_USER_REQUEST],
         )
         for user in [requester, other_approver]:
             DataProductRoleAssignmentFactory(
-                user_id=user.id,
+                identity_id=user.id,
                 role_id=approver_role.id,
                 data_product_id=data_product.id,
             )
@@ -224,7 +224,7 @@ class TestDataProductRoleAssignmentsRouter:
         response = client.post(
             f"{ENDPOINT}/request",
             json={
-                "user_id": str(requested_user.id),
+                "identity_id": str(requested_user.id),
                 "role_id": str(requested_role.id),
                 "data_product_id": str(data_product.id),
             },
@@ -249,7 +249,7 @@ class TestDataProductRoleAssignmentsRouter:
             response = client.post(
                 f"{ENDPOINT}/request",
                 json={
-                    "user_id": str(user.id),
+                    "identity_id": str(user.id),
                     "role_id": str(role.id),
                     "data_product_id": str(data_product.id),
                 },
@@ -264,13 +264,13 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=[Action.DATA_PRODUCT__DELETE_USER],
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
         assignment: DataProductRoleAssignment = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
         )
 
@@ -297,18 +297,18 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=[Action.DATA_PRODUCT__DELETE_USER],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=user.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         role = RoleFactory.data_product_owner()
         user_1, user_2 = UserFactory.create_batch(2)
         assignment_1 = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user_1.id,
+            identity_id=user_1.id,
             role_id=role.id,
         )
         assignment_2 = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user_2.id,
+            identity_id=user_2.id,
             role_id=role.id,
         )
 
@@ -326,13 +326,13 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=[Action.DATA_PRODUCT__APPROVE_USER_REQUEST],
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
         assignment: DataProductRoleAssignment = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             decision=DecisionStatus.PENDING,
         )
@@ -356,13 +356,13 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=[Action.DATA_PRODUCT__APPROVE_USER_REQUEST],
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
         assignment: DataProductRoleAssignment = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             decision=DecisionStatus.DENIED,
         )
@@ -380,13 +380,13 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=[Action.DATA_PRODUCT__APPROVE_USER_REQUEST],
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
         assignment: DataProductRoleAssignment = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             decision=DecisionStatus.DENIED,
         )
@@ -403,12 +403,12 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=[Action.DATA_PRODUCT__APPROVE_USER_REQUEST],
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         assignment: DataProductRoleAssignment = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=None,
         )
 
@@ -425,7 +425,7 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_USER],
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
@@ -433,7 +433,7 @@ class TestDataProductRoleAssignmentsRouter:
 
         assignment: DataProductRoleAssignment = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             decision=DecisionStatus.APPROVED,
         )
@@ -452,7 +452,7 @@ class TestDataProductRoleAssignmentsRouter:
 
         assignment: DataProductRoleAssignment = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=RoleFactory.data_product_owner().id,
             decision=DecisionStatus.APPROVED,
         )
@@ -471,7 +471,7 @@ class TestDataProductRoleAssignmentsRouter:
         )
         DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
         )
 
@@ -498,7 +498,7 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=[Action.DATA_PRODUCT__CREATE_USER],
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
@@ -507,7 +507,7 @@ class TestDataProductRoleAssignmentsRouter:
             f"{ENDPOINT}",
             json={
                 "data_product_id": str(data_product.id),
-                "user_id": str(user.id),
+                "identity_id": str(user.id),
                 "role_id": str(role.id),
             },
         )
@@ -522,17 +522,17 @@ class TestDataProductRoleAssignmentsRouter:
         data_product: DataProduct = DataProductFactory()
         me = UserFactory(external_id=settings.DEFAULT_USERNAME)
         authz_role = RoleFactory(
-            scope=Scope.DATASET,
+            scope=Scope.DATASET, # TODO is this correct?
             permissions=[Action.DATA_PRODUCT__APPROVE_USER_REQUEST],
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
         assignment: DataProductRoleAssignment = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             decision=DecisionStatus.PENDING,
         )
@@ -553,7 +553,7 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_USER],
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
@@ -561,7 +561,7 @@ class TestDataProductRoleAssignmentsRouter:
 
         assignment: DataProductRoleAssignment = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             decision=DecisionStatus.APPROVED,
         )
@@ -584,13 +584,13 @@ class TestDataProductRoleAssignmentsRouter:
             permissions=[Action.DATA_PRODUCT__DELETE_USER],
         )
         DataProductRoleAssignmentFactory(
-            user_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
+            identity_id=me.id, role_id=authz_role.id, data_product_id=data_product.id
         )
         user: User = UserFactory()
         role: Role = RoleFactory(scope=Scope.DATA_PRODUCT)
         assignment: DataProductRoleAssignment = DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
         )
 
@@ -618,7 +618,7 @@ class TestDataProductRoleAssignmentsRouter:
         )
         DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role1.id,
         )
         user_requester: User = UserFactory()
@@ -628,7 +628,7 @@ class TestDataProductRoleAssignmentsRouter:
             f"{ENDPOINT}",
             json={
                 "data_product_id": str(data_product.id),
-                "user_id": str(user_requester.id),
+                "identity_id": str(user_requester.id),
                 "role_id": str(role2.id),
             },
         )
@@ -655,7 +655,7 @@ class TestDataProductRoleAssignmentsRouter:
         )
         DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role1.id,
         )
         user_requester: User = UserFactory()
@@ -665,7 +665,7 @@ class TestDataProductRoleAssignmentsRouter:
             f"{ENDPOINT}",
             json={
                 "data_product_id": str(data_product.id),
-                "user_id": str(user_requester.id),
+                "identity_id": str(user_requester.id),
                 "role_id": str(role2.id),
             },
         )

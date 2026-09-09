@@ -48,7 +48,7 @@ def user_with_create_data_product_rights():
         permissions=[Action.GLOBAL__CREATE_DATAPRODUCT],
     )
     GlobalRoleAssignmentFactory(
-        user_id=user.id,
+        identity_id=user.id,
         role_id=role.id,
     )
     return user
@@ -175,7 +175,7 @@ class TestDataProductsRouter:
         DataProductRoleAssignmentFactory(
             data_product_id=data_product.id,
             role_id=role.id,
-            user_id=user.id,
+            identity_id=user.id,
         )
         response = client.get(
             ENDPOINT, params={"assignment_filter": AssignmentFilter.ONLY_ASSIGNED.value}
@@ -204,7 +204,7 @@ class TestDataProductsRouter:
         DataProductRoleAssignmentFactory(
             data_product_id=data_product_hidden_access.id,
             role_id=role.id,
-            user_id=user.id,
+            identity_id=user.id,
         )
         response = client.get(
             ENDPOINT, params={"assignment_filter": AssignmentFilter.ALL.value}
@@ -240,7 +240,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__READ_INTEGRATIONS],
         )
         DataProductRoleAssignmentFactory(
-            data_product_id=data_product.id, role_id=role.id, user_id=user.id
+            data_product_id=data_product.id, role_id=role.id, identity_id=user.id
         )
 
         response = self.get_data_product(client, data_product.id)
@@ -256,7 +256,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__READ_INTEGRATIONS],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -288,7 +288,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_PROPERTIES],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -312,7 +312,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_PROPERTIES],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -337,7 +337,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__DELETE],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -352,7 +352,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__DELETE],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -375,7 +375,7 @@ class TestDataProductsRouter:
             permissions=[Action.GLOBAL__MANAGE_FINALIZERS],
         )
         GlobalRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
         )
         response = client.post(
@@ -436,7 +436,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_STATUS],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -463,7 +463,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_PROPERTIES],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -502,7 +502,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_SETTINGS],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -527,7 +527,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_SETTINGS],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -549,7 +549,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_SETTINGS],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -618,7 +618,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__READ_INTEGRATIONS],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -638,7 +638,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__READ_INTEGRATIONS],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -666,7 +666,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__READ_INTEGRATIONS],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -719,7 +719,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_PROPERTIES],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -764,7 +764,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_PROPERTIES],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -785,7 +785,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_PROPERTIES],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )
@@ -803,7 +803,7 @@ class TestDataProductsRouter:
             permissions=[Action.DATA_PRODUCT__UPDATE_STATUS],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
             data_product_id=data_product.id,
         )

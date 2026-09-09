@@ -140,7 +140,7 @@ class TestUsersRouter:
             scope=Scope.GLOBAL, permissions=[AuthorizationAction.GLOBAL__CREATE_USER]
         )
         GlobalRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
         )
         response = client.put(
@@ -163,7 +163,7 @@ class TestUsersRouter:
             scope=Scope.GLOBAL, permissions=[AuthorizationAction.GLOBAL__CREATE_USER]
         )
         GlobalRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
         )
         response = client.put(
@@ -188,7 +188,7 @@ class TestUsersRouter:
             scope=Scope.GLOBAL, permissions=[AuthorizationAction.GLOBAL__CREATE_USER]
         )
         GlobalRoleAssignmentFactory(
-            user_id=user.id,
+            identity_id=user.id,
             role_id=role.id,
         )
         response = client.put(
@@ -280,7 +280,7 @@ class TestUsersRouter:
             ],
         )
         DataProductRoleAssignmentFactory(
-            user_id=user.id, role_id=role.id, data_product_id=data_product.id
+            identity_id=user.id, role_id=role.id, data_product_id=data_product.id
         )
 
         ds = OutputPortFactory(data_product=data_product)
