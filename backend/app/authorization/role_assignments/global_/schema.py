@@ -9,7 +9,7 @@ from app.authorization.role_assignments.global_.model import (
     GlobalRoleAssignment as GlobalRoleAssignmentModel,
 )
 from app.authorization.roles.schema import Role
-from app.identities.model import Identity
+from app.identities.schema import Identity
 from app.shared.schema import ORMModel
 from app.users.schema import User
 

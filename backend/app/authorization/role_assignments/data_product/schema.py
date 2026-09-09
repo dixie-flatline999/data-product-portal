@@ -11,7 +11,7 @@ from app.authorization.role_assignments.data_product.model import (
 from app.authorization.role_assignments.enums import DecisionStatus
 from app.authorization.roles.schema import Role
 from app.data_products.schema import DataProduct
-from app.identities.model import Identity
+from app.identities.schema import Identity
 from app.shared.schema import ORMModel
 from app.users.schema import User
 

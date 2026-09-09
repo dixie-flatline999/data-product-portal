@@ -5,9 +5,12 @@ import emailgen
 from app.core.email.send_mail import send_mail
 from app.data_products.schema import DataProduct
 from app.identities.model import Identity
-from app.users.model import User as UserModel
 from app.settings import settings
 from app.users.schema import User
+
+from app.users.model import User as UserModel
+from app.groups.model import Group as GroupModel
+from app.machine_users.model import MachineUser as MachineUserModel
 
 
 def send_role_assignment_request_email(
@@ -41,5 +44,7 @@ def send_role_assignment_request_email(
 def get_identity_display_name(identity: Identity) -> str:
     if isinstance(identity, UserModel):
         return f"{identity.first_name} {identity.last_name}"
-    else:
+    elif isinstance(identity, (GroupModel, MachineUserModel)):
         return identity.display_name
+
+    raise ValueError(f"Unsupported identity type: {identity.type}")

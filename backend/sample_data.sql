@@ -418,7 +418,7 @@ INSERT INTO public.abstract_data_products (id, status, finalizers, name, namespa
 INSERT INTO public.data_products (id, about, type_id, lifecycle_id, usage)
 VALUES ('{{ demo_domain_environments_dp_id }}'::uuid, '<h3>Value Proposition</h3><p>Demonstrates a domain configured with a custom environment list (development only) instead of the global environment list.</p>', '{{ analytics_type_id }}'::uuid, '{{ data_product_lifecycle_id }}'::uuid, NULL);
 
-INSERT INTO public.role_assignments_data_product (id, data_product_id, user_id, role_id, decision, requested_by_id, requested_on, decided_by_id, decided_on, created_on, updated_on, deleted_at)
+INSERT INTO public.role_assignments_data_product (id, data_product_id, identity_id, role_id, decision, requested_by_id, requested_on, decided_by_id, decided_on, created_on, updated_on, deleted_at)
 VALUES (gen_random_uuid(), '{{ demo_domain_environments_dp_id }}'::uuid, '{{ john_id }}'::uuid, (
     SELECT r.id FROM public.roles AS r
     WHERE r.scope = 'data_product' AND r.prototype = 2

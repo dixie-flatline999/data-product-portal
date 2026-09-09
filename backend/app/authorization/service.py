@@ -86,7 +86,7 @@ class AuthorizationService:
     def _sync_product_assignments(self) -> tuple[int, int]:
         service = DataProductRoleAssignmentService(self.db)
         product_assignments = service.list_assignments(
-            data_product_id=None, user_id=None, decision=DecisionStatus.APPROVED
+            data_product_id=None, identity_id=None, decision=DecisionStatus.APPROVED
         )
 
         changes = 0
@@ -110,7 +110,7 @@ class AuthorizationService:
     def _sync_global_assignments(self) -> tuple[int, int]:
         service = GlobalRoleAssignmentService(self.db)
         global_assignments = service.list_assignments(
-            user_id=None, decision=DecisionStatus.APPROVED
+            identity_id=None, decision=DecisionStatus.APPROVED
         )
 
         changes = 0

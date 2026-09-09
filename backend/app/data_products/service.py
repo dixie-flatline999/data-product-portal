@@ -180,13 +180,13 @@ class DataProductService(AbstractDataProductService):
             options=[selectinload(DataProductModel.assignments)],
             populate_existing=True,
         )
-        user_ids = [
-            assignment.user_id
+        identity_ids = [
+            assignment.identity_id
             for assignment in data_product.assignments
             if assignment.role.prototype == Prototype.OWNER
         ]
         return self.db.scalars(
-            select(UserModel).filter(UserModel.id.in_(user_ids))
+            select(UserModel).filter(UserModel.id.in_(identity_ids))
         ).all()
 
     def _get_tags(self, tag_ids: list[UUID]) -> list[TagModel]:
