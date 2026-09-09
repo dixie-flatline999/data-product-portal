@@ -48,7 +48,7 @@ class TestAuthorization:
     def test_wildcard_resource_role(self, authorizer: Authorization):
         role = "public_reader"
         obj = "test_resource"
-        allowed = AuthorizationAction.HIDDEN_DATA_PRODUCT__READ
+        allowed = AuthorizationAction.HIDDEN__DATA_PRODUCT__READ
         denied = AuthorizationAction.DATA_PRODUCT__UPDATE_SETTINGS
 
         authorizer.sync_role_permissions(role_id=role, actions=[allowed])
@@ -337,7 +337,7 @@ class TestCrossWorkerStaleness:
                 ),
                 {"u": user, "r": role, "obj": resource},
             )
-            conn.commit()
+            conn.commit()  # noqa: allow-commit
 
         # In-memory is stale: still denied despite the DB change
         assert (
@@ -361,5 +361,4 @@ class TestCrossWorkerStaleness:
                 ),
                 {"u": user, "r": role, "obj": resource},
             )
-            conn.commit()
         authorizer.remove_role_permissions(role_id=role)

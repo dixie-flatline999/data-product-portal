@@ -26,6 +26,11 @@ sidebar_position: 200
 - **[General]**: We now allow changing DB pool settings, this allows you to tweak this for your specific environment. We set the default to a pool of 20 and a max overflow of 20, which should be sufficient for most installations.
 - **[Data model]**: Allow uploading the data model of an output port through the UI
 - **[Data Product Roles]**: Data product roles can now also give rights to all output ports under a data product, instead of only the data product itself. By default a Data Product owner, can do all actions on all Output Ports under that Data Product.
+- **[General]**: Introduced settings that allow domains to specify their own set of enabled environments or use the global default.
+
+### bugfixes
+
+- **[Provisioner]**: Access to the finalizer endpoint of exploration and data product is now only possible as an admin. The provisioner should always run with admin credentials.
 
 ## 0.7.0
 
