@@ -67,7 +67,7 @@ def data_product_role_assignment(technical_asset_payload) -> Role:
         permissions=[Action.DATA_PRODUCT__CREATE_TECHNICAL_ASSET],
     )
     DataProductRoleAssignmentFactory(
-        identity_id=technical_asset_payload["identity_id"],
+        identity_id=technical_asset_payload["user_id"],
         role_id=role.id,
         data_product_id=technical_asset_payload["owner_id"],
     )
