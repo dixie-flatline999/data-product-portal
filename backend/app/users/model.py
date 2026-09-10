@@ -57,6 +57,7 @@ class User(Identity):
     dataset_roles: Mapped[list["DatasetRoleAssignment"]] = relationship(
         foreign_keys="DatasetRoleAssignment.user_id",
         back_populates="user",
+        cascade="all, delete-orphan",
         # Deliberately lazy:
         #  - Used in limited cases, only on a single user
         #  - Complicates get_authenticated_user

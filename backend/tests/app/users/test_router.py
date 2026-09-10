@@ -21,6 +21,13 @@ from tests.factories import (
     TechnicalAssetOutputPortAssociationFactory,
     UserFactory,
 )
+from app.authorization.role_assignments.data_product.model import (
+    DataProductRoleAssignment,
+)
+from app.authorization.role_assignments.output_port.model import (
+    DatasetRoleAssignment,
+)
+from app.users.model import User
 
 ENDPOINT = "/api/v2/users"
 
@@ -55,6 +62,80 @@ class TestUsersRouter:
         response = client.get(f"{ENDPOINT}")
         assert response.status_code == 200
         assert len(response.json()["users"]) == 1
+
+    @pytest.mark.usefixtures("admin")
+    def test_remove_user__with_data_product_role(self, client, session):
+        user = UserFactory()
+        data_product = DataProductFactory()
+        role = RoleFactory(scope=Scope.DATA_PRODUCT, permissions=[])
+        assignment = DataProductRoleAssignmentFactory(
+            identity_id=user.id,
+            data_product_id=data_product.id,
+            role_id=role.id,
+        )
+
+        # stored for later comparison
+        user_id = user.id
+        assignment_id = assignment.id
+        response = client.delete(f"{ENDPOINT}/{user_id}")
+
+        assert response.status_code == 200, response.text
+        session.expire_all()
+        assert session.get(User, user_id) is None
+        assert session.get(DataProductRoleAssignment, assignment_id) is None
+
+    @pytest.mark.usefixtures("admin")
+    def test_remove_user__with_dataset_role(self, client, session):
+        user = UserFactory()
+        output_port = OutputPortFactory()
+        role = RoleFactory(scope=Scope.DATASET, permissions=[])
+        assignment = DatasetRoleAssignmentFactory(
+            user_id=user.id,
+            output_port=output_port,
+            role_id=role.id,
+        )
+
+        # stored for later comparison
+        user_id = user.id
+        assignment_id = assignment.id
+        response = client.delete(f"{ENDPOINT}/{user_id}")
+
+        assert response.status_code == 200, response.text
+        session.expire_all()
+        assert session.get(User, user_id) is None
+        assert session.get(DatasetRoleAssignment, assignment_id) is None
+
+    @pytest.mark.usefixtures("admin")
+    def test_remove_user__with_data_product_and_dataset_roles(self, client, session):
+        user = UserFactory()
+
+        data_product = DataProductFactory()
+        data_product_role = RoleFactory(scope=Scope.DATA_PRODUCT, permissions=[])
+        data_product_assignment = DataProductRoleAssignmentFactory(
+            identity_id=user.id,
+            data_product_id=data_product.id,
+            role_id=data_product_role.id,
+        )
+
+        output_port = OutputPortFactory()
+        dataset_role = RoleFactory(scope=Scope.DATASET, permissions=[])
+        dataset_assignment = DatasetRoleAssignmentFactory(
+            user_id=user.id,
+            output_port=output_port,
+            role_id=dataset_role.id,
+        )
+
+        # stored for later comparison
+        user_id = user.id
+        data_product_assignment_id = data_product_assignment.id
+        dataset_assignment_id = dataset_assignment.id
+        response = client.delete(f"{ENDPOINT}/{user_id}")
+
+        assert response.status_code == 200, response.text
+        session.expire_all()
+        assert session.get(User, user_id) is None
+        assert session.get(DataProductRoleAssignment, data_product_assignment_id) is None
+        assert session.get(DatasetRoleAssignment, dataset_assignment_id) is None
 
     def test_post_user_not_admin(self, client):
         response = client.post(f"{ENDPOINT}")
