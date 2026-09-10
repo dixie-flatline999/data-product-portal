@@ -42,6 +42,7 @@ from app.database.deps import get_db_session
 from app.events.enums import EventReferenceEntity, EventType
 from app.events.schema import CreateEvent
 from app.events.service import EventService
+from app.identities.service import get_identity_display_name
 from app.users.notifications.service import NotificationService
 from app.users.schema import User
 
@@ -149,9 +150,9 @@ def request_data_product_role_assignment(
     )
     other_approvers = [a for a in approvers if a != user]
     if other_approvers:
-        background_tasks.add_task( # TODO evaluate in depth
+        background_tasks.add_task(
             email.send_role_assignment_request_email,
-            deepcopy(role_assignment.identity),
+            get_identity_display_name(role_assignment.identity),
             deepcopy(role_assignment.data_product),
             [deepcopy(approver) for approver in other_approvers],
         )
@@ -215,7 +216,7 @@ def create_data_product_role_assignment(
     else:
         background_tasks.add_task(
             email.send_role_assignment_request_email,
-            deepcopy(role_assignment.identity),
+            get_identity_display_name(role_assignment.identity),
             deepcopy(role_assignment.data_product),
             [deepcopy(approver) for approver in approvers],
         )

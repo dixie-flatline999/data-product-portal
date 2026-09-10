@@ -78,7 +78,7 @@ class TestDataProductRoleAssignmentsRouter:
             f"{ENDPOINT}",
             json={
                 "data_product_id": str(data_product.id),
-                "identity_id": str(user.id), # TODO user.id or me.id here?????
+                "identity_id": str(user.id),
                 "role_id": str(role.id),
             },
         )
