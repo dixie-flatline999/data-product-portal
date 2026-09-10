@@ -47,13 +47,8 @@ class Identity(Base, BaseORM):
     data_product_roles: Mapped[list["DataProductRoleAssignment"]] = relationship(
         foreign_keys="DataProductRoleAssignment.identity_id",
         back_populates="identity",
-        # Deliberately lazy:
-        #  - Used in limited cases, only on a single identity
-        #  - Complicates get_authenticated_user
-        #  - Private dataset test cases become more complex
-        #    (need to manipulate the session to avoid an identity being cached with a
-        #     membership field with raise load strategy)
-        lazy="select",
+        cascade="all, delete-orphan", # TODO discuss this with the team
+        lazy="raise",
     )
     data_products: AssociationProxy[list["DataProduct"]] = association_proxy(
         "data_product_roles",

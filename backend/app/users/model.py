@@ -96,5 +96,5 @@ class User(Identity):
         return hash(self.id) if self.id is not None else id(self)
 
 
-def ensure_user_exists(user_id: UUID, db: Session) -> User:
-    return ensure_exists(user_id, db, User)
+def ensure_user_exists(user_id: UUID, db: Session, options: list = []) -> User:
+    return ensure_exists(user_id, db, User, options=options)
