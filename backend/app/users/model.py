@@ -26,9 +26,6 @@ if TYPE_CHECKING:
 
 class User(Identity):
     __tablename__ = "users"
-    __mapper_args__ = {
-        "polymorphic_identity": IdentityType.USER.value,
-    }
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -83,6 +80,10 @@ class User(Identity):
         back_populates="approved_by",
         lazy="raise",
     )
+
+    __mapper_args__ = {
+        "polymorphic_identity": IdentityType.USER.value,
+    }
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, User):

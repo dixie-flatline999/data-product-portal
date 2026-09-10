@@ -43,10 +43,6 @@ class Identity(Base, BaseORM):
     type: Mapped[str] = mapped_column(String, nullable=False)
     external_id: Mapped[str] = mapped_column(String, nullable=False)
 
-    # Must be below the "type" column definition
-    __mapper_args__ = {
-        "polymorphic_on": type
-    }
 
     data_product_roles: Mapped[list["DataProductRoleAssignment"]] = relationship(
         foreign_keys="DataProductRoleAssignment.identity_id",
@@ -69,3 +65,7 @@ class Identity(Base, BaseORM):
         back_populates="identity",
         lazy="select",
     )
+
+    __mapper_args__ = {
+        "polymorphic_on": type
+    }

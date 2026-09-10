@@ -12,9 +12,6 @@ from app.shared.model import BaseORM
 
 class Group(Identity):
     __tablename__ = "groups"
-    __mapper_args__ = {
-        "polymorphic_identity": IdentityType.GROUP.value,
-    }
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -29,6 +26,10 @@ class Group(Identity):
         cascade="all, delete-orphan",
         lazy="raise",
     )
+
+    __mapper_args__ = {
+        "polymorphic_identity": IdentityType.GROUP.value,
+    }
 
 
 class GroupMembership(Base, BaseORM):
