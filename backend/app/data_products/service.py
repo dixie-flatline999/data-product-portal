@@ -157,7 +157,7 @@ class DataProductService(AbstractDataProductService):
             case AssignmentFilter.ONLY_ASSIGNED:
                 query = query.filter(
                     DataProductModel.assignments.any(
-                        user_id=current_user.id,
+                        identity_id=current_user.id,
                         decision=DecisionStatus.APPROVED,
                     )
                 )
