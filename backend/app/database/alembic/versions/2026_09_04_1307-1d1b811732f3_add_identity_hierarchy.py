@@ -166,6 +166,12 @@ def downgrade() -> None:
         """
     )
 
+    op.create_unique_constraint(
+        "uq_users_external_id",
+        "users",
+        ["external_id"],
+    )
+
     op.drop_constraint(
         "fk_users_id_identities",
         "users",
