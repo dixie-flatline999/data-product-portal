@@ -3,7 +3,7 @@ from typing import Sequence
 from uuid import UUID
 
 from fastapi import HTTPException, status
-from sqlalchemy import select, asc
+from sqlalchemy import asc, select
 from sqlalchemy.orm import Session
 
 from app.authorization.role_assignments.data_product.model import (
@@ -13,7 +13,11 @@ from app.authorization.role_assignments.enums import DecisionStatus
 from app.core.authz import Authorization
 from app.groups.model import Group, GroupMembership, ensure_group_exists
 from app.groups.schema_request import GroupCreate, GroupUpdate
-from app.groups.schema_response import GroupCreateResponse, GroupUpdateResponse, GroupGet
+from app.groups.schema_response import (
+    GroupCreateResponse,
+    GroupGet,
+    GroupUpdateResponse,
+)
 from app.identities.model import ensure_identity_exists
 from app.machine_users.model import MachineUser
 from app.users.model import User
@@ -140,7 +144,6 @@ class GroupService:
                 detail="Member not found.",
             )
         return membership
-
 
     def add_data_product_membership_edges(
         self,
